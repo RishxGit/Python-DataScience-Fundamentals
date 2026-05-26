@@ -1,6 +1,6 @@
 """
 Object-Oriented Programming in Python
-====================================
+-------------------------------------------
 
 This file demonstrates core OOP concepts in Python:
 - Classes & Objects
@@ -13,13 +13,16 @@ This file demonstrates core OOP concepts in Python:
 - Inheritance & Multiple Inheritance
 - Abstract Classes
 - super()
+- Polymorphism
+- Duck typing
+- composition
+- nested classes
 
 """
 
-#----------------------------------BASIC CLASS & OBJECTS-----------------------------------------------------
+#-------------------------------------------------BASIC CLASS & OBJECTS-----------------------------------------------------------------
 
 
-'''
 class Car:
     """A simple Car class."""
 
@@ -45,12 +48,12 @@ print(car2.model)
 print(car2.year)
 
 car1.stop()
-'''
+
 
 #------------------------------------------------STATIC METHODS----------------------------------------------
 
 
-'''
+
 class Employee:
     """Represents an employee."""
 
@@ -69,12 +72,11 @@ class Employee:
 
 
 print(Employee.is_valid_position("cook"))
-'''
 
 # -------------------------------------------------CLASS METHODS----------------------------------------
 
 
-'''
+
 class Student:
     """Tracks student data and GPA statistics."""
 
@@ -110,13 +112,13 @@ student3 = Student("Daniel", 4.0)
 
 print(Student.get_count())
 print(Student.average_gpa())
-'''
+
 
 # ----------------------------------------MAGIC METHODS (DUNDER METHODS)------------------------------------
 
 
 
-'''
+
 class Book:
     """Book class with custom magic methods."""
 
@@ -164,14 +166,14 @@ book2 = Book("The Great Escape", "John Walker", 104)
 book3 = Book("Silent Storm", "Sarah Mitchell", 204)
 
 print(book2["author"])
-'''
+
 
 
 # ---------------------------------PROPERTIES (@property)----------------------------------------------------
 
 
 
-'''
+
 class Rectangle:
     """Rectangle class using property decorators."""
 
@@ -207,11 +209,11 @@ rectangle.width = 5
 
 print(rectangle.width)
 print(rectangle.height)
-'''
+
 
 #-----------------------------------------------------DECORATORS -----------------------------------------------------
 
-'''
+
 def add_sprinkles(func):
     """Decorator that adds sprinkles."""
 
@@ -239,13 +241,12 @@ def get_ice_cream(flavor):
 
 
 get_ice_cream("Vanilla")
-'''
 
-# ============================================================
-# MULTIPLE INHERITANCE
-# ============================================================
 
-'''
+
+#-----------------------------------------MULTIPLE INHERITANCE------------------------------------------------
+
+
 class Animal:
     """Base Animal class."""
 
@@ -288,12 +289,11 @@ hawk = Hawk("Hunter")
 fish = Fish("Blue")
 
 fish.eat()
-'''
-
-#---------------------------------------- ABSTRACT CLASSES -----------------------------------------------------
 
 
-'''
+#------------------------------------------------- ABSTRACT CLASSES ----------------------------------------------------------
+
+
 from abc import ABC, abstractmethod
 
 
@@ -331,12 +331,11 @@ bike = Bike()
 
 bike.go()
 bike.stop()
-'''
-
-# ---------------------------------------------SUPER()----------------------------------------------
 
 
-'''
+# -------------------------------------------------------SUPER()-----------------------------------------------------------
+
+
 
 class Shape:
     """Base shape class."""
@@ -392,6 +391,150 @@ square = Square("Blue", False, 7)
 triangle = Triangle("Yellow", True, 6, 8)
 
 triangle.describe()
-'''
 
 
+
+#----------------------------------------------------POLYMORPHISM----------------------------------------------------------------
+
+from abc import ABC,abstractmethod
+
+class Shape:
+
+    @abstractmethod
+    def area(self):
+        pass
+
+
+class Circle(Shape):
+
+    def __init__(self,radius):
+        self.radius = radius
+        
+    def area(self):
+        area = 3.14 * self.radius ** 2
+        print(f"It is a circle with an area of {area:.2f} cm².")
+
+
+class Square(Shape):
+
+    def __init__(self, width):
+        self.width = width
+
+
+    def area(self):
+        area = self.width ** 2
+        print(f"It is a square with an area of {area:.2f} cm².")
+
+
+class Triangle(Shape):
+
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+
+    def area(self):
+        area = (self.width * self.height) / 2
+        print(f"It is a triangle with an area of {area:.2f} cm².")
+
+
+class Pizza(Circle):
+    def __init__(self,topping,radius):
+        super().__init__(radius)
+        self.topping = topping
+
+shapes = [Circle(4),Square(5),Triangle(6,7),Pizza("cheese",15)]
+
+for shape in shapes:
+    (shape.area())
+
+
+
+#-----------------------------------------------------DUCK TYPING-----------------------------------------------------------------
+
+class Animal:
+    alive = True
+
+class Dog(Animal):
+    def speak(self):
+        print("WOOF!")
+
+class Cat(Animal):
+    def speak(self):
+        print("MEOW!")
+
+
+class Car:
+
+    alive = False
+
+    def speak(self):
+        print("HONK!")
+
+
+animals = [Dog(),Cat(),Car()]
+
+for animal in animals:
+    animal.speak()
+    print(animal.alive)
+
+
+
+#--------------------------------------------------------COMPOSITION-------------------------------------------------------------
+
+class Engine:
+    def __init__(self,horse_power):
+        self.horse_power = horse_power
+
+
+class Wheel:
+    def __init__(self,size):
+        self.size = size
+
+class Car:
+    def __init__(self,make,model,horse_power,wheel_size):
+        self.make = make
+        self.model = model
+        self.engine = Engine(horse_power)
+        self.wheels = [Wheel(wheel_size) for wheel in range(4)]
+
+    def display_car(self):
+        return f"{self.make} {self.model} {self.engine.horse_power}(hp) {self.wheels[0].size}in"
+
+car = Car("BMW","M3",500,19)
+
+print(car.display_car())
+
+
+#------------------------------------------------------NESTED CLASSES----------------------------------------------------------------
+class Company:
+    class Employee:
+        def __init__(self,name,position):
+            self.name = name
+            self.position = position
+
+        def get_details(self):
+            return f"{self.name} {self.position}"
+    def __init__(self, company_name):
+        self.company_name = company_name
+        self.employees = []
+
+    def add_employee(self,name,position):
+        new_employee = self.Employee(name,position)
+        self.employees.append(new_employee)
+
+    def list_employees(self):
+        return [employee.get_details() for employee in self.employees]
+
+company = Company("Test comp")
+company2 = Company("Test2 comp")
+
+company.add_employee("test1", "manager")
+company.add_employee("test2", "HR")
+company.add_employee("test3", "lead")
+
+company2.add_employee("test1", "CEO")
+company2.add_employee("test2", "CFO")
+
+for employee in company2.list_employees():
+    print(employee)
